@@ -3,6 +3,13 @@
 # should be /app
 echo $PWD
 
+if [[ -z $APP_SKIP_DOTENV ]]; then
+    echo "Generating .env in app directory..."
+    export > /home/container/app/.env
+    sed -i 's/declare -x //g' /home/container/app/.env
+    echo "done."
+fi
+
 echo "Setup work..."
 if [[ ! -z $SETUPCMD ]]; then
     echo $SETUPCMD
@@ -55,13 +62,6 @@ if [[ -z $APP_SKIP_INSTALL ]]; then
     composer install --no-dev
 else
     echo "Skipping composer install."
-fi
-
-if [[ -z $APP_SKIP_DOTENV ]]; then
-    echo "Generating .env in app directory..."
-    export > /home/container/app/.env
-    sed -i 's/declare -x //g' /home/container/app/.env
-    echo "done."
 fi
 
 echo "Pre-work..."
