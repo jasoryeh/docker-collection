@@ -3,17 +3,17 @@
 # should be /app
 echo $PWD
 
+echo "Setup work..."
+if [[ ! -z $SETUPCMD ]]; then
+    echo $SETUPCMD
+    eval $SETUPCMD
+fi
+
 if [[ -z $APP_SKIP_DOTENV ]]; then
     echo "Generating .env in app directory..."
     export > /home/container/app/.env
     sed -i 's/declare -x //g' /home/container/app/.env
     echo "done."
-fi
-
-echo "Setup work..."
-if [[ ! -z $SETUPCMD ]]; then
-    echo $SETUPCMD
-    eval $SETUPCMD
 fi
 
 # make dirs
