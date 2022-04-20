@@ -6,7 +6,12 @@ function substitute {
     cat /tmp/$1/tmp.txt > $2
 }
 
-substitute /home/container/config/nginx.conf /etc/nginx/conf.d/default.conf
+if [ -z "$PROXIED" ]; then
+    substitute /home/container/config/nginx.conf /etc/nginx/conf.d/default.conf
+else
+    echo "Using proxied config"
+    substitute /home/container/config/nginx.conf.proxied /etc/nginx/conf.d/default.conf
+fi
 
 IFS=';'
 read -ra CRED <<< $AUTH_CREDENTIALS
