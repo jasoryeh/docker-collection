@@ -13,13 +13,17 @@ else
     substitute /home/container/config/nginx.conf.proxied /etc/nginx/conf.d/default.conf
 fi
 
+if [ ! -f /auth.htpasswd ]; then
+    touch /auth.htpasswd
+fi
+
 IFS=';'
 read -ra CRED <<< $AUTH_CREDENTIALS
 for i in "${CRED[@]}"; do
     echo "->"
     IFS=':'
     read -ra PAIR <<< $i
-    htpasswd -b -B -c /auth.htpasswd "${PAIR[0]}" "${PAIR[1]}"
+    htpasswd -b -B /auth.htpasswd "${PAIR[0]}" "${PAIR[1]}"
     IFS=';'
 done
 IFS=' '
