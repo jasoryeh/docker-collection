@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ ! -z $TUNNEL_PASSWORD ]]; then
+    echo "tun:$TUNNEL_PASSWORD" | chpasswd
+    echo "tun account password set!"
+fi
+
 echo "* generate hostkeys"
 ssh-keygen -A
 
@@ -18,6 +23,7 @@ echo "    * Change the port the container listens to by specifying '-e PORT=#' w
 echo "    * If you would like to change the hostname (${HOSTNAME}), please change it for the docker container"
 echo "    * Ensure host networking (or your networking choice) is enabled if you'd like all tunnels to be accessible"
 echo "        OR pass the ports with option '-p'"
+echo "    * If you would like to set a password for the 'tun' account, please specify TUNNEL_PASSWORD"
 echo ""
 
 echo "* start sshd on :${PORT}"
