@@ -4,22 +4,26 @@ set -e
 
 WORKING_DIR=$PWD
 
-EXP_CLEANUP() {
-    echo "(Experimental) Cleaning up build environment..."
-    docker buildx rm -f images-builder
-}
-
-if [ ! -z ${MULTIARCH} ]; then
-    trap EXP_CLEANUP EXIT
-    docker buildx create --name images-builder --driver-opt network=host --use --bootstrap
-fi
-
-
 REGISTRY="127.0.0.1:5000"
 if [ ! -z ${DOCKER_REGISTRY} ]; then
     REGISTRY=${DOCKER_REGISTRY}
 fi
 
+EXP_CLEANUP() {
+    echo "Cleaning up build environment..."
+    docker buildx rm -f images-builder
+}
+
+if [ ! -z ${MULTIARCH} ]; then
+    echo "" > buildx.toml
+    if [ ! -z ${INSECURE_REGISTRY} ]; then
+        echo "[registry.\"$REGISTRY\"]" >> ./buildx.toml
+        echo "  http = true" >> ./buildx.toml
+        echo "  insecure = true" >> ./buildx.toml
+    fi
+    trap EXP_CLEANUP EXIT
+    docker buildx create --name images-builder --config ./buildx.toml --driver-opt network=host --use --bootstrap
+fi
 
 function build {
     IM_NAME=$1
