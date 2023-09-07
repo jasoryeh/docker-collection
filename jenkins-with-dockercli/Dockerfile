@@ -11,14 +11,11 @@ RUN apt-get update && \
       gnupg2 \
       software-properties-common \
       maven && \
-    curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey && \
-    add-apt-repository \
-      "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-      $(lsb_release -cs) \
-      stable" && \
-   apt-get update && \
-   apt-get -y --no-install-recommends install docker-ce && \
-   apt-get clean && \
-   usermod -aG docker jenkins
+   apt-get clean
+
+RUN DOCKER_VERSION=24.0.6 && \
+      curl -fsSLO https://download.docker.com/linux/static/stable/$(lscpu | awk '/Architecture:/{print $2}')/docker-${DOCKER_VERSION}.tgz && \
+      tar xzvf docker-${DOCKER_VERSION}.tgz --strip 1 -C /usr/local/bin docker/docker && \
+      rm docker-${DOCKER_VERSION}.tgz
 
 USER jenkins

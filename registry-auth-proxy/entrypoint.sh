@@ -1,4 +1,4 @@
-SUBSTITUTES="$(python -c 'import os; print(",".join( "${" + x + "}" for x in os.environ ))')"
+SUBSTITUTES="$(python3 -c 'import os; print(",".join( "${" + x + "}" for x in os.environ ))')"
 echo "$SUBSTITUTES"
 function substitute {
     mkdir -p /tmp/$1

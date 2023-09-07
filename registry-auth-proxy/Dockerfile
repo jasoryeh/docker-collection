@@ -2,7 +2,7 @@ FROM nginx:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt -y update && apt -y install \
-    python \
+    python3 \
     apache2-utils && \
     apt autoremove --purge -y && apt autoclean -y && apt clean -y && \
     rm -rf /var/lib/apt/lists/* && \
