@@ -1,4 +1,4 @@
-FROM php:8.0.8-fpm-buster
+FROM php:8.2-fpm-buster
 
 # dependencies
 ARG DEBIAN_FRONTEND=noninteractive
