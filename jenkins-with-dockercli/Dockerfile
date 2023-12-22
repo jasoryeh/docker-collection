@@ -10,7 +10,8 @@ RUN apt-get update && \
       curl \
       gnupg2 \
       software-properties-common \
-      maven && \
+      maven \
+      patch && \
    apt-get clean
 
 RUN DOCKER_VERSION=24.0.6 && \
