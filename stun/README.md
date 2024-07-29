@@ -2,8 +2,9 @@
 STUN stands for Secure TUNnel. This container contains a SSH server configured to enable remote and local port forwarding over SSH. Containerizing the SSH service will allow running an isolated SSH instance dedicated to tunneling without the potential of exposing the host.
 
 ## Configuration
+`STUN_USER`: The username for STUN.
 `HOSTNAME`: The hostname you're using (to show on the prompt when running the container).
-`TUNNEL_PASSWORD`: The password for the `tun` account (e.g. `tun@hostname`'s password).
+`TUNNEL_PASSWORD`: The password for the `$STUN_USER` account (e.g. `tun@hostname`'s password).
 `PORT`: The port the SSH server will be listening on.
 
 ## Running
@@ -18,14 +19,14 @@ docker run -d -it --net=host -e "HOSTNAME=tunnel.example.com" -e "PORT=23" -e "T
 ## Using
 
 ### To tunnel:
-To use: 'ssh -p $PORT <args> tun@$HOSTNAME'
+To use: 'ssh -p $PORT <args> $STUN_USER@$HOSTNAME'
 
 ```sh
 ssh -p $PORT \
     -o 'StrictHostKeyChecking no' \
     -o 'UserKnownHostsFile=/dev/null' \
     <MORE ARGUMENTS HERE>
-    tun@$HOSTNAME
+    $STUN_USER@$HOSTNAME
 ```
 
 Strict Host Key Checks: SSH uses host key checking to validate that a server you connect to is the same as the one you connected to before by sending a challenge to the server to verify it's identity.

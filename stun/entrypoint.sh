@@ -1,8 +1,10 @@
 #!/bin/bash
 
+adduser $STUN_USER -D && passwd -d $STUN_USER
+
 if [[ ! -z $TUNNEL_PASSWORD ]]; then
-    echo "tun:$TUNNEL_PASSWORD" | chpasswd
-    echo "tun account password set!"
+    echo "$STUN_USER:$TUNNEL_PASSWORD" | chpasswd
+    echo "stun user $STUN_USER account password set!"
 fi
 
 echo "$TUNNEL_LOG_SCRIPT" > /stun-login-script.sh
@@ -14,14 +16,15 @@ echo "* generate hostkeys"
 ssh-keygen -A
 
 echo $PORT > /stun/envs_PORT
+echo $STUN_USER > /stun/envs_USER
 
 echo ""
 echo ">> stun!"
 echo ""
-echo "See instructions for usage by issuing 'ssh tun@${HOSTNAME}'"
+echo "See instructions for usage by issuing 'ssh ${STUN_USER}@${HOSTNAME}'"
 echo "  (notes)"
 echo "    * if this stun instance is ephemeral, use instead: "
-echo "        'ssh -p $PORT -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile=/dev/null' tun@${HOSTNAME}'"
+echo "        'ssh -p $PORT -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile=/dev/null' ${STUN_USER}@${HOSTNAME}'"
 echo "      to avoid key check failures with reuse."
 echo "  (container options)"
 echo "    * Change the port the container listens to by specifying '-e PORT=#' where # is the port number"
