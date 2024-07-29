@@ -32,4 +32,4 @@ echo "    * If you would like to set a password for the 'tun' account, please sp
 echo ""
 
 echo "* start sshd on :${PORT}"
-/usr/sbin/sshd -D -p ${PORT} -e
+/usr/sbin/sshd -D -p ${PORT} -e $SSHD_ARGS
