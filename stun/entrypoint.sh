@@ -5,6 +5,11 @@ if [[ ! -z $TUNNEL_PASSWORD ]]; then
     echo "tun account password set!"
 fi
 
+echo "$TUNNEL_LOG_SCRIPT" > /stun-login-script.sh
+echo "STUN Started $(date) $(user) \n$(export)" >> /stun.log
+chmod 777 /stun.log
+tail -f -n 5 /stun.log &
+
 echo "* generate hostkeys"
 ssh-keygen -A
 

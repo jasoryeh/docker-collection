@@ -9,6 +9,15 @@ fi
 IAM=$(whoami)
 PORT=$(cat /stun/envs_PORT)
 
+echo "CONNECTION=$(date) User='$USER' Client='$SSH_CLIENT' Connection='$SSH_CONNECTION' Command='$SSH_ORIGINAL_COMMAND'" >> /stun.log
+echo "$(export)" >> /stun.log
+if [ -f /stun-login-script.sh ]; then
+    eval "$(cat /stun-login-script.sh)"
+fi
+
+if [ -z /stun/envs_NOCLEAR ]; then
+    clear
+fi
 clear
 echo ""
 echo ">>> Location: $LOCATION"
