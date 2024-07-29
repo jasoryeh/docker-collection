@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Documentation:
+#
+# DOCKER_REGISTRY - the user or repo of the container, the container will be pushed as such: $DOCKER_REGISTRY/$IMAGE_NAME
+# MULTIARCH - whether or not to use buildx to create a container compatible with different architectures
+#
+# Usage to build multiarch to jasoryeh/my account: MULTIARCH=1 DOCKER_REGISTRY=jasoryeh bash build.sh
+
 set -e
 
 WORKING_DIR=$PWD
