@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# The tunnel user $STUN_USER will be flashed info on info.sh and forced to run this script.
+
 while true; do
     #clear
     sh /stun/info.sh

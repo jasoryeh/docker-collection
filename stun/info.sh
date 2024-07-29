@@ -1,24 +1,29 @@
 #!/bin/sh
 
+# get the hostname to display to the users
 if [ -z "${HOSTNAME}" ]; then
     LOCATION="tunnel.example.com"
 else
     LOCATION="${HOSTNAME}"
 fi
 
+# acquire any stun variables
 IAM=$(whoami)
 PORT=$(cat /stun/envs_PORT)
 
+# log a stun event
 echo "CONNECTION=$(date) User='$USER' Client='$SSH_CLIENT' Connection='$SSH_CONNECTION' Command='$SSH_ORIGINAL_COMMAND'" >> /stun.log
 echo "$(export)" >> /stun.log
 if [ -f /stun-login-script.sh ]; then
     eval "$(cat /stun-login-script.sh)"
 fi
 
+# debug: clear the console if necessary
 if [ -z /stun/envs_NOCLEAR ]; then
     clear
 fi
-clear
+
+# dispaly info to tunnel user
 echo ""
 echo ">>> Location: $LOCATION"
 echo "If you are tunneling, your tunnels should be active right now!"
