@@ -53,3 +53,4 @@ build disposable-minecraft
 build registry-auth-proxy
 build jenkins-with-dockercli
 build php-laravel
+build pterodactyl-wings
