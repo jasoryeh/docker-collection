@@ -11,9 +11,13 @@ set -e
 
 WORKING_DIR=$PWD
 
-REGISTRY="127.0.0.1:5000"
 if [ ! -z ${DOCKER_REGISTRY} ]; then
     REGISTRY=${DOCKER_REGISTRY}
+fi
+
+if [ -z "$REGISTRY" ]; then
+    echo "No registry found, please specify a 'DOCKER_REGISTRY' environment variable!"
+    exit 1
 fi
 
 EXP_CLEANUP() {
@@ -22,6 +26,7 @@ EXP_CLEANUP() {
 }
 
 if [ ! -z ${MULTIARCH} ]; then
+    echo "Configuring a ./buildx.toml to support multiarch builds!"
     echo "" > buildx.toml
     if [ ! -z ${INSECURE_REGISTRY} ]; then
         echo "[registry.\"$REGISTRY\"]" >> ./buildx.toml
