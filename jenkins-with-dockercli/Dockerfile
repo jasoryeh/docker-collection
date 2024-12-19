@@ -19,6 +19,9 @@ RUN apt-get update && \
       apt-get update && \
       apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin && \
       apt-get clean && \
-      usermod -aG docker jenkins
+      usermod -aG docker jenkins && \
+      sed -i -e "s/ulimit -Hn 524288/ulimit -n 524288/g" /etc/init.d/docker
 
-USER jenkins
+COPY start.sh /usr/local/bin/start.sh
+
+ENTRYPOINT [ "/bin/bash", "/usr/local/bin/start.sh" ]
