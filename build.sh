@@ -43,21 +43,20 @@ function build {
     echo "Building $IM_NAME to $REGISTRY/$IM_NAME, Multiarch=$MULTIARCH"
 
     if [ ! -z ${MULTIARCH} ]; then
-        if [ -z ${PUSH} ]; then
+        if [ ! -z ${PUSH} ]; then
             docker buildx build --platform linux/amd64,linux/aarch64 --push -t $REGISTRY/$IM_NAME -f Dockerfile .
         else
             docker buildx build --platform linux/amd64,linux/aarch64 -t $REGISTRY/$IM_NAME -f Dockerfile .
         fi
     else
         docker build -t $REGISTRY/$IM_NAME -f Dockerfile .
-        if [ -z ${PUSH} ]; then
+        if [ ! -z ${PUSH} ]; then
             docker push $REGISTRY/$IM_NAME
         fi
     fi
     
     cd $WORKING_DIR
 }
-
 
 build stun
 build disposable-minecraft
