@@ -84,7 +84,13 @@ RUN curl -Ss https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN rm /etc/nginx/sites-enabled/default
 COPY ./supervisord.conf /home/container/supervisor/
 COPY ./entrypoint.sh /entrypoint.sh
-COPY ./cacert.pem /home/container/certs/
+
+# Resolve PHP curl missing cacert.pem at some point in time,
+#   this might have been already resolved, but we'll change 
+#   this to download the certificate authority public keys
+#   from curl.se to be safe and so that this isn't hardcoded
+RUN curl "https://curl.se/ca/cacert.pem" > /home/container/app/cacert.pem
+
 COPY ./defaultapp /home/container/app
 COPY . /home/container/config/
 
