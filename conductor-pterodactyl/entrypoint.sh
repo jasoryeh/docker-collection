@@ -29,12 +29,17 @@ warn_soft() {
 }
 
 ## reusing DL_PATH as a way to communicate a script or other thing to download
+DL_TO_FILE=${DL_FILE}
+if [ -z ${DL_TO_FILE} ]; then
+    DL_TO_FILE="dlpath.sh"
+fi
+
 if [ ! -z "${DL_PATH}" ]; then
     info "Downloading startup setup script from:\n\t${DL_PATH}\n..."
-    rm -f ./dlpath.sh && curl "${DL_PATH}" > ./dlpath.sh
+    rm -f ./dlpath.sh && curl "${DL_PATH}" > $DL_TO_FILE
     if [ ! -z "${DL_PATH_EXEC}" ]; then
         info "Executing DL_PATH script..."
-        bash ./dlpath.sh
+        bash $DL_TO_FILE
         info "Finished DL_PATH execution, result: $?"
     fi
     info "DL_PATH complete"
@@ -87,14 +92,6 @@ SPECIALFLAGS=""
 echo ":${PWD}$ ${MODIFIED_STARTUP}"
 
 # start not pterodactyl
-# keep up to date
-
-# don't delete configuration if "dontupdate" is present in /home/container, this is used by us to indicate that we modified something
-if [ ! -f dontupdate ]; then
-    rm -f server_cnf.json
-else
-    warn_soft "The 'dontupdate' file was found! The 'server_cnf.json' file was not modified."
-fi
 
 # always populate server_cnf.json if it's not there
 if [ ! -f server_cnf.json ]; then
