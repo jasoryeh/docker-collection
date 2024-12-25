@@ -1,0 +1,12 @@
+{
+  "_conductor": {
+    "name": "Conductor Base Image",
+    "version": "1"
+  },
+  "filesystem": {
+    "conductor.hello.txt": {
+      "type": "file",
+      "content": "Hi from conductor :)"
+    }
+  }
+}

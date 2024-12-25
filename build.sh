@@ -39,25 +39,37 @@ fi
 
 function build {
     IM_NAME=$1
+    IM_VARIANT="Dockerfile"
+    if [ ! -z ${2} ]; then
+        IM_VARIANT="$2.Dockerfile"
+    fi
+    IM_TAG=""
+    if [ ! -z ${2} ]; then
+        IM_TAG=":$2"
+    fi
     cd $1
-    echo "Building $IM_NAME to $REGISTRY/$IM_NAME, Multiarch=$MULTIARCH"
+    echo "Building $IM_NAME ($IM_VARIANT) to $REGISTRY/$IM_NAME$IM_TAG, Multiarch=$MULTIARCH"
 
     if [ ! -z ${MULTIARCH} ]; then
         if [ ! -z ${PUSH} ]; then
-            docker buildx build --platform linux/amd64,linux/aarch64 --push -t $REGISTRY/$IM_NAME -f Dockerfile .
+            docker buildx build --platform linux/amd64,linux/aarch64 --push -t $REGISTRY/$IM_NAME$IM_TAG --build-arg INTERMEDIATE_REPO=$REGISTRY -f $IM_VARIANT .
         else
-            docker buildx build --platform linux/amd64,linux/aarch64 -t $REGISTRY/$IM_NAME -f Dockerfile .
+            docker buildx build --platform linux/amd64,linux/aarch64 -t $REGISTRY/$IM_NAME$IM_TAG --build-arg INTERMEDIATE_REPO=$REGISTRY -f $IM_VARIANT .
         fi
     else
-        docker build -t $REGISTRY/$IM_NAME -f Dockerfile .
+        docker build -t $REGISTRY/$IM_NAME$IM_TAG --build-arg INTERMEDIATE_REPO=$REGISTRY -f $IM_VARIANT .
         if [ ! -z ${PUSH} ]; then
-            docker push $REGISTRY/$IM_NAME
+            docker push $REGISTRY/$IM_NAME$IM_TAG
         fi
     fi
     
     cd $WORKING_DIR
 }
 
+build conductor-pterodactyl 8
+build conductor-pterodactyl 17
+build conductor-pterodactyl 21
+build conductor-pterodactyl
 build stun
 build disposable-minecraft
 build registry-auth-proxy
