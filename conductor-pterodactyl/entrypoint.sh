@@ -94,10 +94,9 @@ export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 # convert "{{vars}}" to "${vars}"
 MODIFIED_STARTUP=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
 
-# finds the below (CONDUCTOR_RUNTIMEFLAGS) to replace with (SPECIALFLAGS)
-CONDUCTOR_RUNTIMEFLAGS="-Dconductor.runtime_flags=here"
+# finds the below $CONDUCTOR_RUNTIMEFLAGS_PLACEHOLDER to replace with $CONDUCTOR_RUNTIMEFLAGS
+CONDUCTOR_RUNTIMEFLAGS_PLACEHOLDER="-Dconductor.runtime_flags=here"
 # populate with runtime flags, if any "-Dsome.flag=some-value"
-SPECIALFLAGS=""
 
 echo ":${PWD}$ ${MODIFIED_STARTUP}"
 
@@ -136,8 +135,8 @@ if [ ! -z "${CONDUCTOR_DEBUG}" ]; then
 fi
 
 # add specialflags just before starting
-if [ ! -z "${SPECIALFLAGS}" ]; then
-    MODIFIED_STARTUP=$(echo ${MODIFIED_STARTUP} | sed -e "s+$CONDUCTOR_RUNTIMEFLAGS+$SPECIALFLAGS+g")
+if [ ! -z "${CONDUCTOR_RUNTIMEFLAGS}" ]; then
+    MODIFIED_STARTUP=$(echo ${MODIFIED_STARTUP} | sed -e "s+$CONDUCTOR_RUNTIMEFLAGS_PLACEHOLDER+$CONDUCTOR_RUNTIMEFLAGS+g")
 fi
 
 # life
