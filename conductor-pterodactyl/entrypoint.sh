@@ -31,7 +31,7 @@ warn_soft() {
 ## reusing DL_PATH as a way to communicate a script or other thing to download
 DL_TO_FILE=${DL_FILE}
 if [ -z ${DL_TO_FILE} ]; then
-    DL_TO_FILE="./dlpath.sh"
+    DL_TO_FILE="./conductor-dl.sh"
 fi
 
 if [ ! -z "${DL_PATH}" ]; then
