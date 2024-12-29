@@ -5,6 +5,10 @@ set -e
 # for pterodactyl
 cd /home/container
 
+info "DEBUG START: The following output is to be used for debugging purposes."
+java -version
+info "DEBUG END: The above output is to be used for debugging purposes."
+
 warn() {
     echo -e "--------------------------------------------------"
     echo -e "\nWARNING:\n"
@@ -47,6 +51,16 @@ else
     info "DL_PATH not used."
 fi
 
+# load conductor.env in work directory if present into environment
+if [ -f conductor.env ]; then
+	#export $(grep -v '^#' conductor.env | xargs -d '\n')  # 8-jdk slim images
+	export $(cat conductor.env | xargs)  # 8-jre-alpine images
+	info "Loaded 'conductor.env'"
+else
+    warn_soft "A 'conductor.env' file was not specified, no file-based environment variables were loaded!"
+fi
+
+# Check Pterodactyl variable: STARTUP
 if [ -z "${STARTUP}" ]; then
     warn "STARTUP not found, please specify a run command (e.g. 'java -jar server.jar')"
     exit 1
@@ -54,6 +68,7 @@ else
     info "Startup command detected:\n\t${STARTUP}"
 fi
 
+# Check Pterodactyl variable: SERVER_PORT; and non-pterodactyl: PORT
 if [ -z "${SERVER_PORT}" ]; then
     if [ ! -z "${PORT}" ]; then
         SERVER_PORT=$PORT
@@ -65,24 +80,18 @@ if [ -z "${SERVER_PORT}" ]; then
     info "Server Port:\n\t${SERVER_PORT}"}
 fi
 
-info "DEBUG START: The following output is to be used for debugging purposes."
-java -version
-info "DEBUG END: The above output is to be used for debugging purposes."
+# validation complete.
 
-if [ -f conductor.env ]; then
-	#export $(grep -v '^#' conductor.env | xargs -d '\n')  # 8-jdk slim images
-	export $(cat conductor.env | xargs)  # 8-jre-alpine images
-	info "Loaded 'conductor.env'"
-else
-    warn_soft "A 'conductor.env' file was not specified, no downloaded configuration is loaded!"
-fi
-
+# Pre-start script
 if [ -f prestart.sh ]; then
     info "Running pre-start script"
     bash prestart.sh
 fi
 
+# expose IP as environment
 export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
+
+# convert "{{vars}}" to "${vars}"
 MODIFIED_STARTUP=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
 
 # finds the below (CONDUCTOR_RUNTIMEFLAGS) to replace with (SPECIALFLAGS)
@@ -91,8 +100,6 @@ CONDUCTOR_RUNTIMEFLAGS="-Dconductor.runtime_flags=here"
 SPECIALFLAGS=""
 
 echo ":${PWD}$ ${MODIFIED_STARTUP}"
-
-# start not pterodactyl
 
 # always populate server_cnf.json if it's not there
 if [ ! -f server_cnf.json ]; then
