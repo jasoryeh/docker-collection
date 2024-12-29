@@ -32,6 +32,13 @@ warn_soft() {
     sleep 5
 }
 
+debug_shell() {
+    if [ ! -z "${CONDUCTOR_DEBUG}" ]; then
+        warn "CONDUCTOR_DEBUG is enabled (Pre-Run)."
+        sh
+    fi
+}
+
 ## reusing DL_PATH as a way to communicate a script or other thing to download
 DL_TO_FILE=${DL_FILE}
 if [ -z ${DL_TO_FILE} ]; then
@@ -123,10 +130,7 @@ if [ -f prestart.sh ]; then
 fi
 
 # debug shell after setup
-if [ ! -z "${CONDUCTOR_DEBUG}" ]; then
-    warn "CONDUCTOR_DEBUG is enabled (Pre-Run)."
-    sh
-fi
+debug_shell
 
 # add specialflags just before starting
 if [ ! -z "${CONDUCTOR_RUNTIMEFLAGS}" ]; then
@@ -140,10 +144,7 @@ EXEC_STATUS=$!
 info "Execution finished, status: ${EXEC_STATUS}"
 
 # debug shell after finishing
-if [ ! -z "${CONDUCTOR_DEBUG}" ]; then
-    warn "CONDUCTOR_DEBUG is enabled (Post-Run)."
-    sh
-fi
+debug_shell
 
 if [ -f poststart.sh ]; then
     info "Running post-start script...\n"
