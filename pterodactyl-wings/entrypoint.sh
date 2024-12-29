@@ -4,7 +4,7 @@ set -m
 
 # verify env
 function verifyenv {
-	if [[ -z "$2" ]]; then
+	if [ -z ${2} ]; then
 		echo "Unable to continue! $1 is not valid, value: '$2'"
 		kill -9 $$
 	fi
@@ -12,8 +12,85 @@ function verifyenv {
 }
 verifyenv "$PTERODACTYL_PANEL_URL" "PTERODACTYL_PANEL_URL"
 verifyenv "$PTERODACTYL_TOKEN" "PTERODACTYL_TOKEN"
-verifyenv "$PTERODACTYL_NODE_ID" "PTERODACTYL_NODE_ID"
 
+function destroy_created_node {
+	if [ -z ${PTERODACTYL_DELETE_NODE} ]; then
+		echo "Not deleting node on shutdown because PTERODACTYL_DELETE_NODE wasn't defined"
+	fi
+	echo "Destroying node $PTERODACTYL_NODE_ID"
+	RESPONSE=$(curl "${PTERODACTYL_PANEL_URL}/api/application/nodes/$PTERODACTYL_NODE_ID" \
+		-H 'Accept: application/json' \
+		-H 'Content-Type: application/json' \
+		-H "Authorization: Bearer ${PTERODACTYL_TOKEN}" \
+		-X DELETE)
+	echo "Destroyed node!"
+}
+trap destroy_created_node EXIT
+
+function create_node {
+	if [ -z ${PTERODACTYL_NODE_FQDN} ]; then
+		PTERODACTYL_NODE_FQDN=$(curl http://api.ipify.org)
+		echo "FQDN was not specified, using IP address instead: ${PTERODACTYL_NODE_FQDN}"
+		if [ -z ${PTERODACTYL_NODE_SCHEME} ]; then
+			PTERODACTYL_NODE_SCHEME=http
+			echo "Setting PTERODACTYL_NODE_SCHEME to http because FQDN was not provided"
+		fi
+	fi
+	if [[ -z "${PTERODACTYL_NODE_MEMORY}" ]]; then
+		PTERODACTYL_NODE_MEMORY=$(awk '/MemTotal/ {printf( "%.0f\n", $2 / 1024 )}' /proc/meminfo)
+		if [ $PTERODACTYL_NODE_MEMORY -le 0 ]; then
+			echo "Warning: Detected an invalid memory size, forcing it to 2000 MB (${PTERODACTYL_NODE_MEMORY})"
+			PTERODACTYL_NODE_MEMORY=2000
+		fi
+		echo "Memory limit not defined, detecting it instead. Found: ${PTERODACTYL_NODE_MEMORY}"
+	fi
+	if [[ -z "${PTERODACTYL_NODE_DISK}" ]]; then
+		PTERODACTYL_NODE_DISK=$(df -Pk . | tail -1 | awk '{print $4}')
+		if [ $PTERODACTYL_NODE_DISK -le 0 ]; then
+			echo "Warning: Detected an invalid disk size, forcing it to 10000 MB (${PTERODACTYL_NODE_DISK})"
+			PTERODACTYL_NODE_DISK=10000
+		fi
+		echo "Disk limit not defined, detecting it instead. Found: ${PTERODACTYL_NODE_DISK}"
+	fi
+	POST_BODY="{
+			\"name\": \"Auto - ${PTERODACTYL_NODE_NAME:-Unknown $(date +"%Y-%m-%d %H_%M_%S")}\",
+			\"location_id\": ${PTERODACTYL_NODE_LOCATION:-1},
+			\"fqdn\": \"${PTERODACTYL_NODE_FQDN:-unknown.hogt.me}\",
+			\"scheme\": \"${PTERODACTYL_NODE_SCHEME:-https}\",
+			\"memory\": ${PTERODACTYL_NODE_MEMORY:-2000},
+			\"memory_overallocate\": ${PTERODACTYL_NODE_MEMORY_OVERALLOCATE:--1},
+			\"disk\": ${PTERODACTYL_NODE_DISK:-100000},
+			\"disk_overallocate\": ${PTERODACTYL_NODE_DISK_OVERALLOCATE:--1},
+			\"upload_size\": ${PTERODACTYL_NODE_UPLOAD_SIZE:-1000},
+			\"daemon_sftp\": ${PTERODACTYL_NODE_SFTP_PORT:-2022},
+			\"daemon_listen\": ${PTERODACTYL_NODE_PORT:-8080}
+		}"
+	echo "Create Node: POST $POST_BODY"
+	RESPONSE=$(curl "${PTERODACTYL_PANEL_URL}/api/application/nodes" \
+		-H 'Accept: application/json' \
+		-H 'Content-Type: application/json' \
+		-H "Authorization: Bearer ${PTERODACTYL_TOKEN}" \
+		-X POST \
+		-d "$POST_BODY")
+	echo "Response: $RESPONSE"
+	PTERODACTYL_NODE_ID=$(echo "$RESPONSE" | jq -e ".attributes.id")
+}
+
+if [ -z ${PTERODACTYL_CREATE_NODE} ]; then
+	verifyenv "$PTERODACTYL_NODE_ID" "PTERODACTYL_NODE_ID"
+	if [ -z ${PTERODACTYL_NODE_ID} ]; then
+		echo "PTERODACTYL_NODE_ID is empty but PTERODACTYL_CREATE_NODE is not set!"
+		exit 1
+	fi
+else
+	if [ -z ${PTERODACTYL_NODE_ID} ]; then
+		echo "Will create node to populate Node ID."
+		create_node
+		echo "Node created: $PTERODACTYL_NODE_ID"
+	else
+		echo "Node ID is already specified! ($PTERODACTYL_NODE_ID) Won't create a new node."
+	fi
+fi
 
 function setup_wings {
     if [ -f /etc/pterodactyl/config.yml ]; then
