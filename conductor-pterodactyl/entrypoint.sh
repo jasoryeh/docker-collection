@@ -58,13 +58,19 @@ else
     info "DL_PATH not used."
 fi
 
-# load conductor.env in work directory if present into environment
-if [ -f conductor.env ]; then
-	#export $(grep -v '^#' conductor.env | xargs -d '\n')  # 8-jdk slim images
-	export $(cat conductor.env | xargs)  # 8-jre-alpine images
-	info "Loaded 'conductor.env'"
+if [ ! -z ${CONDUCTOR_ENVFILE} ]; then
+    ENVFILE=$CONDUCTOR_ENVFILE
 else
-    warn_soft "A 'conductor.env' file was not specified, no file-based environment variables were loaded!"
+    ENVFILE="conductor.env"
+fi
+
+# load conductor.env in work directory if present into environment
+if [ -f "$ENVFILE" ]; then
+	#export $(grep -v '^#' $ENVFILE | xargs -d '\n')  # 8-jdk slim images
+	export $(cat $ENVFILE | xargs)  # 8-jre-alpine images
+	info "Loaded '$ENVFILE'"
+else
+    warn_soft "A '$ENVFILE' file was not specified, no file-based environment variables were loaded!"
 fi
 
 # Check Pterodactyl variable: STARTUP
