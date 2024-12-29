@@ -10,10 +10,11 @@ ENV  USER=container HOME=/home/container
 WORKDIR /home/container
 COPY . /files
 
+COPY ./entrypoint.sh /base_entrypoint.sh
 COPY ./entrypoint.sh /entrypoint.sh
-COPY ./conductor-updater.jar /conductor-updater.jar
 COPY ./server_cnf.json /server_cnf.json
 
-COPY ./entrypoint.sh /base_entrypoint.sh
+
+COPY --from=jasoryeh/conductor /conductor.jar /conductor-updater.jar
 
 CMD ["/bin/bash", "/base_entrypoint.sh"]
