@@ -82,12 +82,6 @@ fi
 
 # validation complete.
 
-# Pre-start script
-if [ -f prestart.sh ]; then
-    info "Running pre-start script"
-    bash prestart.sh
-fi
-
 # expose IP as environment
 export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 
