@@ -5,10 +5,6 @@ set -e
 # for pterodactyl
 cd /home/container
 
-info "DEBUG START: The following output is to be used for debugging purposes."
-java -version
-info "DEBUG END: The above output is to be used for debugging purposes."
-
 warn() {
     echo -e "--------------------------------------------------"
     echo -e "\nWARNING:\n"
@@ -38,6 +34,10 @@ debug_shell() {
         sh
     fi
 }
+
+info "DEBUG START: The following output is to be used for debugging purposes."
+java -version
+info "DEBUG END: The above output is to be used for debugging purposes."
 
 ## reusing DL_PATH as a way to communicate a script or other thing to download
 DL_TO_FILE=${DL_FILE}
