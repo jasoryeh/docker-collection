@@ -66,6 +66,13 @@ function build {
     cd $WORKING_DIR
 }
 
+if [ ! -d conductor ]; then
+    git clone https://github.com/jasoryeh/conductor.git $WORKING_DIR/conductor
+else
+    cd $WORKING_DIR/conductor && git pull -f && cd $WORKING_DIR
+fi
+
+build conductor
 build conductor-pterodactyl 8
 build conductor-pterodactyl 17
 build conductor-pterodactyl 21
