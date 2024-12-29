@@ -17,13 +17,12 @@ RUN sed -i 's/0.0.0.0/127.0.0.1/g' /usr/local/bin/dockerd-entrypoint.sh
 #RUN addgroup -g 2999 docker
 RUN apk add bash curl unzip tar yq jq git go
 # change following if upgrading wings
-RUN WINGS_VERSION=1.11.13 && \
-    mkdir -p /etc/pterodactyl && \
-    curl -L -o /tmp/wings.tar.gz https://github.com/pterodactyl/wings/archive/refs/tags/v${WINGS_VERSION}.tar.gz && \
+RUN mkdir -p /etc/pterodactyl && \
+    curl -L -o /tmp/wings.tar.gz $(curl -s "https://api.github.com/repos/pterodactyl/wings/releases/latest" | jq -re ".tarball_url") && \
     cd /tmp && \
     tar -xzvf wings.tar.gz && \
-    cd wings-${WINGS_VERSION} && \
-    go build && mv /tmp/wings-${WINGS_VERSION}/wings /usr/local/bin/wings && \
+    cd /tmp/$(ls -1 /tmp | grep pterodactyl-wings | tail -n 1) && \
+    go build && mv /tmp/$(ls -1 /tmp | grep pterodactyl-wings | tail -n 1)/wings /usr/local/bin/wings && \
     chmod u+x /usr/local/bin/wings
 
 ADD . .
