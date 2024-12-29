@@ -125,11 +125,6 @@ if [ -f postupdate.sh ]; then
     bash postupdate.sh
 fi
 
-if [ -f log4j-custom.xml ]; then
-    LOG4JCUSTOM="$PWD/log4j-custom.xml"
-    SPECIALFLAGS="-Dlog4j.configurationFile=$LOG4JCUSTOM"
-fi
-
 if [ -f prestart.sh ]; then
     bash prestart.sh
 fi
