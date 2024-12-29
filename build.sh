@@ -66,7 +66,7 @@ function build {
     cd $WORKING_DIR
 }
 
-if [ ! -d conductor ]; then
+if [ ! -d $WORKING_DIR/conductor ]; then
     git clone https://github.com/jasoryeh/conductor.git $WORKING_DIR/conductor
 else
     cd $WORKING_DIR/conductor && git pull -f && cd $WORKING_DIR
