@@ -25,7 +25,9 @@ warn_soft() {
     echo -e "$*\n"
     echo -e "\nExecution will resume in 5 seconds.\n"
     echo -e "--------------------------------------------------"
-    sleep 5
+    if [ -z ${CONDUCTOR_SKIP_WARN_DELAYS} ]; then
+        sleep 5
+    fi
 }
 
 debug_shell() {
