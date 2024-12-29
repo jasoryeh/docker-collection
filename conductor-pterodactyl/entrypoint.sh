@@ -31,12 +31,12 @@ warn_soft() {
 ## reusing DL_PATH as a way to communicate a script or other thing to download
 DL_TO_FILE=${DL_FILE}
 if [ -z ${DL_TO_FILE} ]; then
-    DL_TO_FILE="dlpath.sh"
+    DL_TO_FILE="./dlpath.sh"
 fi
 
 if [ ! -z "${DL_PATH}" ]; then
     info "Downloading startup setup script from:\n\t${DL_PATH}\n..."
-    rm -f ./dlpath.sh && curl "${DL_PATH}" > $DL_TO_FILE
+    rm -f $DL_TO_FILE && curl "${DL_PATH}" > $DL_TO_FILE
     if [ ! -z "${DL_PATH_EXEC}" ]; then
         info "Executing DL_PATH script..."
         bash $DL_TO_FILE
@@ -85,6 +85,7 @@ fi
 export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 MODIFIED_STARTUP=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
 
+# finds the below (CONDUCTOR_RUNTIMEFLAGS) to replace with (SPECIALFLAGS)
 CONDUCTOR_RUNTIMEFLAGS="-Dconductor.runtime_flags=here"
 # populate with runtime flags, if any "-Dsome.flag=some-value"
 SPECIALFLAGS=""
