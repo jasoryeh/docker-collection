@@ -4,9 +4,9 @@ set -m
 
 # verify env
 function verifyenv {
-	if [ -z ${2} ]; then
-		echo "Unable to continue! $1 is not valid, value: '$2'"
-		kill -9 $$
+	if [ -z ${1} ]; then
+		echo "Unable to continue! $2 is not valid, value: '$1'"
+		exit 1
 	fi
 	echo "Valid $2: '$1'"
 }
@@ -14,8 +14,12 @@ verifyenv "$PTERODACTYL_PANEL_URL" "PTERODACTYL_PANEL_URL"
 verifyenv "$PTERODACTYL_TOKEN" "PTERODACTYL_TOKEN"
 
 function destroy_created_node {
+	if [ -z ${PTERODACTYL_NODE_ID} ]; then
+		exit 0
+	fi
 	if [ -z ${PTERODACTYL_DELETE_NODE} ]; then
 		echo "Not deleting node on shutdown because PTERODACTYL_DELETE_NODE wasn't defined"
+		exit 0
 	fi
 	echo "Destroying node $PTERODACTYL_NODE_ID"
 	RESPONSE=$(curl "${PTERODACTYL_PANEL_URL}/api/application/nodes/$PTERODACTYL_NODE_ID" \
@@ -74,6 +78,10 @@ function create_node {
 		-d "$POST_BODY")
 	echo "Response: $RESPONSE"
 	PTERODACTYL_NODE_ID=$(echo "$RESPONSE" | jq -e ".attributes.id")
+	if [ "$PTERODACTYL_NODE_ID" == "null" ]; then
+		echo "Could not create a node automatically! There was no node ID returned."
+		exit 1
+	fi
 }
 
 if [ -z ${PTERODACTYL_CREATE_NODE} ]; then
