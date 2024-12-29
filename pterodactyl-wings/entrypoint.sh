@@ -29,7 +29,7 @@ function destroy_created_node {
 		-X DELETE)
 	echo "Destroyed node!"
 }
-trap destroy_created_node EXIT
+trap destroy_created_node 0
 
 function create_node {
 	if [ -z ${PTERODACTYL_NODE_FQDN} ]; then
@@ -133,17 +133,25 @@ function modify_wings {
     yq eval -i '.docker.network.interfaces.v6.gateway = "fdba:17c8:6c95::1011"' config.yml
 }
 
-function wait_wings {
-	echo "Waiting for daemon to be ready"
-	response="Connection refused"
-	while [[ "$response" == *"Connection refused"* ]]; do
-		echo "Waiting for daemon to actually accept connections..."
-		response=$(eval "curl localhost:8080 2>&1")
-		if [[ "$response" == *"Connection refused"* ]]; then
-			sleep 5
-		fi
+function run_wings {
+	echo "Running wings..."
+	until [[ -f /var/run/docker.pid ]]; do
+		echo "Waiting for docker..."
+		sleep 1
 	done
-	echo "Daemon is ready"
+
+	until docker ps;
+	do
+		echo "Waiting for docker to become available..."
+		sleep 1
+	done
+
+	# TODO: Properly wait for docker to properly initialize
+	echo "Timing out for docker to initialize properly..."
+	sleep 5
+
+	echo "Running wings..."
+	wings --debug
 }
 
 function main {
@@ -151,13 +159,11 @@ function main {
     modify_wings
 	if [ -z ${SKIP_RUN} ]; then
 		echo "Starting services..."
+
 		dockerd-entrypoint.sh &
-        bash /runwings.sh &
-        wait_wings
-		echo "Done!"
-		jobs
-		fg %2
-		fg %1
+		PID_DOCKER=$!
+
+        run_wings
 	fi
 }
 
