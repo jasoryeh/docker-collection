@@ -5,7 +5,7 @@
 # DOCKER_REGISTRY - the user or repo of the container, the container will be pushed as such: $DOCKER_REGISTRY/$IMAGE_NAME
 # MULTIARCH - whether or not to use buildx to create a container compatible with different architectures
 #
-# Usage to build multiarch to jasoryeh/my account: MULTIARCH=1 DOCKER_REGISTRY=jasoryeh bash build.sh
+# Usage to build multiarch to jasoryeh/my account: MULTIARCH=1 DOCKER_REGISTRY=jasoryeh PUSH=1 bash build.sh
 
 set -e
 
@@ -38,33 +38,14 @@ if [ ! -z ${MULTIARCH} ]; then
 fi
 
 function build {
-    IM_NAME=$1
-    IM_VARIANT="Dockerfile"
-    if [ ! -z ${2} ]; then
-        IM_VARIANT="$2.Dockerfile"
-    fi
-    IM_TAG=""
-    if [ ! -z ${2} ]; then
-        IM_TAG=":$2"
-    fi
-    cd $1
-    echo "Building $IM_NAME ($IM_VARIANT) to $REGISTRY/$IM_NAME$IM_TAG, Multiarch=$MULTIARCH"
-
-    if [ ! -z ${MULTIARCH} ]; then
-        if [ ! -z ${PUSH} ]; then
-            docker buildx build --platform linux/amd64,linux/aarch64 --push -t $REGISTRY/$IM_NAME$IM_TAG --build-arg INTERMEDIATE_REPO=$REGISTRY -f $IM_VARIANT .
-        else
-            docker buildx build --platform linux/amd64,linux/aarch64 -t $REGISTRY/$IM_NAME$IM_TAG --build-arg INTERMEDIATE_REPO=$REGISTRY -f $IM_VARIANT .
-        fi
-    else
-        docker build -t $REGISTRY/$IM_NAME$IM_TAG --build-arg INTERMEDIATE_REPO=$REGISTRY -f $IM_VARIANT .
-        if [ ! -z ${PUSH} ]; then
-            docker push $REGISTRY/$IM_NAME$IM_TAG
-        fi
-    fi
-    
-    cd $WORKING_DIR
+    PUSH=$PUSH MULTIARCH=$MULTIARCH REGISTRY=$REGISTRY bash builder.sh $1 $1 ${2:-Dockerfile} $2
 }
+
+function fbuild {
+    PUSH=$PUSH MULTIARCH=$MULTIARCH REGISTRY=$REGISTRY bash builder.sh $*
+}
+
+set -e
 
 if [ ! -d $WORKING_DIR/conductor ]; then
     git clone https://github.com/jasoryeh/conductor.git $WORKING_DIR/conductor
@@ -73,10 +54,10 @@ else
 fi
 
 build conductor
-build conductor-pterodactyl 8
-build conductor-pterodactyl 17
-build conductor-pterodactyl 21
-build conductor-pterodactyl
+build conductor-pterodactyl 8.Dockerfile
+build conductor-pterodactyl 17.Dockerfile
+build conductor-pterodactyl 21.Dockerfile
+fbuild conductor-pterodactyl conductor-pterodactyl 21.Dockerfile
 build stun
 build disposable-minecraft
 build registry-auth-proxy
