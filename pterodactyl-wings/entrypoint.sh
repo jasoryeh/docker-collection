@@ -32,6 +32,10 @@ function destroy_created_node {
 trap destroy_created_node 0
 
 function create_node {
+	if [ -f /etc/pterodactyl/config.yml ]; then
+		echo "The configuration at /etc/pterodacty/config.yml already exists! Are you sure you would like to create a node still?"
+		exit 1
+	fi
 	if [ -z ${PTERODACTYL_NODE_FQDN} ]; then
 		PTERODACTYL_NODE_FQDN=$(curl http://api.ipify.org)
 		echo "FQDN was not specified, using IP address instead: ${PTERODACTYL_NODE_FQDN}"
@@ -84,21 +88,23 @@ function create_node {
 	fi
 }
 
-if [ -z ${PTERODACTYL_CREATE_NODE} ]; then
-	verifyenv "$PTERODACTYL_NODE_ID" "PTERODACTYL_NODE_ID"
-	if [ -z ${PTERODACTYL_NODE_ID} ]; then
-		echo "PTERODACTYL_NODE_ID is empty but PTERODACTYL_CREATE_NODE is not set!"
-		exit 1
-	fi
-else
-	if [ -z ${PTERODACTYL_NODE_ID} ]; then
-		echo "Will create node to populate Node ID."
-		create_node
-		echo "Node created: $PTERODACTYL_NODE_ID"
+function check_node_create {
+	if [ -z ${PTERODACTYL_CREATE_NODE} ]; then
+		verifyenv "$PTERODACTYL_NODE_ID" "PTERODACTYL_NODE_ID"
+		if [ -z ${PTERODACTYL_NODE_ID} ]; then
+			echo "PTERODACTYL_NODE_ID is empty but PTERODACTYL_CREATE_NODE is not set!"
+			exit 1
+		fi
 	else
-		echo "Node ID is already specified! ($PTERODACTYL_NODE_ID) Won't create a new node."
+		if [ -z ${PTERODACTYL_NODE_ID} ]; then
+			echo "Will create node to populate Node ID."
+			create_node
+			echo "Node created: $PTERODACTYL_NODE_ID"
+		else
+			echo "Node ID is already specified! ($PTERODACTYL_NODE_ID) Won't create a new node."
+		fi
 	fi
-fi
+}
 
 function setup_wings {
     if [ -f /etc/pterodactyl/config.yml ]; then
@@ -126,19 +132,15 @@ function modify_wings {
     yq eval -i  '.allowed_origins[0]= "*"' /etc/pterodactyl/config.yml
 
     # shift wings pool downwards 1 (dind uses 172.18.0.1 which is what pterodactyl tried to use, so we set it to 172.19.0.1, and whatever seems right for ipv6 too)
-    yq eval -i '.docker.network.interface = "172.19.0.1"' config.yml
-    yq eval -i '.docker.network.interfaces.v4.subnet = "172.19.0.0/16"' config.yml
-    yq eval -i '.docker.network.interfaces.v4.gateway = "172.19.0.1"' config.yml
-    yq eval -i '.docker.network.interfaces.v6.subnet = "fdba:17c8:6c95::/64"' config.yml
-    yq eval -i '.docker.network.interfaces.v6.gateway = "fdba:17c8:6c95::1011"' config.yml
+    yq eval -i '.docker.network.interface = "172.19.0.1"' /etc/pterodactyl/config.yml
+    yq eval -i '.docker.network.interfaces.v4.subnet = "172.19.0.0/16"' /etc/pterodactyl/config.yml
+    yq eval -i '.docker.network.interfaces.v4.gateway = "172.19.0.1"' /etc/pterodactyl/config.yml
+    yq eval -i '.docker.network.interfaces.v6.subnet = "fdba:17c8:6c95::/64"' /etc/pterodactyl/config.yml
+    yq eval -i '.docker.network.interfaces.v6.gateway = "fdba:17c8:6c95::1011"' /etc/pterodactyl/config.yml
 }
 
 function run_wings {
 	echo "Running wings..."
-	until [[ -f /var/run/docker.pid ]]; do
-		echo "Waiting for docker..."
-		sleep 1
-	done
 
 	until docker ps;
 	do
@@ -155,13 +157,25 @@ function run_wings {
 }
 
 function main {
-    setup_wings
-    modify_wings
+	if [ ! -f /etc/pterodactyl/config.yml ]; then
+		echo "Setting up a new node..."
+		check_node_create
+		setup_wings
+	else
+		echo "Detected an existing node configuration- not running setup or node auto-creation!"
+	fi
+	echo "Adjusting config.yml to use Docker-compatible configuration..."
+	modify_wings
 	if [ -z ${SKIP_RUN} ]; then
 		echo "Starting services..."
 
-		dockerd-entrypoint.sh &
-		PID_DOCKER=$!
+		if [ -z ${SKIP_DOCKER} ]; then
+			echo "Starting internal dockerd..."
+			dockerd-entrypoint.sh &
+			PID_DOCKER=$!
+		else
+			echo "Skipping dockerd..."
+		fi
 
         run_wings
 	fi
