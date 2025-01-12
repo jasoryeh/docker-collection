@@ -47,6 +47,15 @@ function fbuild {
 
 set -e
 
+
+if [ ! -d $WORKING_DIR/wg-zero ]; then
+    git clone https://github.com/jasoryeh/wg-zero.git $WORKING_DIR/wg-zero
+else
+    cd $WORKING_DIR/wg-zero && git pull -f && cd $WORKING_DIR
+fi
+
+build wg-zero
+
 if [ ! -d $WORKING_DIR/conductor ]; then
     git clone https://github.com/jasoryeh/conductor.git $WORKING_DIR/conductor
 else
