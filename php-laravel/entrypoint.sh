@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# should be /app
+# should be /home/container
 echo $PWD
 
 echo "Setup work..."
@@ -25,8 +25,8 @@ mkdir -p /home/container/logs/nginx
 
 # chown workdir
 echo "Acquiring permissions for working directories..."
-chown -R www-data:www-data /home/container/app
 chmod -R 755 /home/container/app
+chown -R www-data:www-data /home/container/app
 
 # setup configs
 echo "Updating configurations..."
@@ -71,7 +71,9 @@ if [[ ! -z $PRECMD ]]; then
 fi
 
 echo "Start server..."
-tail -F -n 100 /home/container/logs/nginx/error.log &
-tail -F -n 100 /home/container/logs/nginx/access.log &
-supervisord -c /home/container/supervisor/supervisord.conf
+supervisord -c /home/container/supervisor/supervisord.conf &
+PID_SUPERVISORD=$!
+
+bash
+
 echo "Done."
