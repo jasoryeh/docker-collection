@@ -9,7 +9,6 @@ RUN apt-get update && \
             ca-certificates \
             curl \
             gnupg2 \
-            software-properties-common \
             maven \
             patch && \
       install -m 0755 -d /etc/apt/keyrings && \
