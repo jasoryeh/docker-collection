@@ -30,4 +30,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     # Build & Publish
     - name: Build & Publish Docker Image
-      run: MULTIARCH=1 DOCKER_REGISTRY=${{ secrets.DOCKER_USERNAME }} bash build.sh
+      run: BUILDX_ARGS="--cache-from=gha --cache-to=gha,mode=max" MULTIARCH=1 DOCKER_REGISTRY=${{ secrets.DOCKER_USERNAME }} bash build.sh
