@@ -30,4 +30,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     # Build & Publish
     - name: Build & Publish Docker Image
-      run: DOCKER_REGISTRY=${{ secrets.DOCKER_USERNAME }} bash build.sh
+      run: MULTIARCH=1 DOCKER_REGISTRY=${{ secrets.DOCKER_USERNAME }} bash build.sh
