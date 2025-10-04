@@ -11,8 +11,9 @@ fi
 
 if [[ -z $APP_SKIP_DOTENV ]]; then
     echo "Generating .env in app directory..."
-    export > /home/container/app/.env
-    sed -i 's/declare -x //g' /home/container/app/.env
+    #export > /home/container/app/.env
+    #sed -i 's/declare -x //g' /home/container/app/.env
+    php -r 'array_map(function ($k) { $v = $_ENV[$k]; str_contains($v, " ") && $v = "\"{$v}\""; echo "{$k}={$v}\n"; }, array_keys($_ENV));' > /home/container/app/.env
     echo "done."
 fi
 
