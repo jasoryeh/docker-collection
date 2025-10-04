@@ -30,10 +30,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     # Build & Publish
     - name: Build & Publish Docker Image
-      run: 
-      uses: docker/build-push-action@v6.11.0
-      with:
-        push: true
-        platforms: linux/amd64,linux/aarch64
-        tags: jasoryeh/conductor:actions-test
-        context: DOCKER_REGISTRY=${{ secrets.DOCKER_USERNAME }} bash build.sh
+      run: DOCKER_REGISTRY=${{ secrets.DOCKER_USERNAME }} bash build.sh
