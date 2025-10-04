@@ -74,6 +74,6 @@ echo "Start server..."
 supervisord -c /home/container/supervisor/supervisord.conf &
 PID_SUPERVISORD=$!
 
-bash
+bash $*
 
 echo "Done."
