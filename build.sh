@@ -38,11 +38,11 @@ if [ ! -z ${MULTIARCH} ]; then
 fi
 
 function build {
-    PUSH=$PUSH MULTIARCH=$MULTIARCH REGISTRY=$REGISTRY bash builder.sh $1 $1 ${2:-Dockerfile} $2
+    BUILDX_ARGS=$BUILDX_ARGS PUSH=$PUSH MULTIARCH=$MULTIARCH REGISTRY=$REGISTRY bash builder.sh $1 $1 ${2:-Dockerfile} $2
 }
 
 function fbuild {
-    PUSH=$PUSH MULTIARCH=$MULTIARCH REGISTRY=$REGISTRY bash builder.sh $*
+    BUILDX_ARGS=$BUILDX_ARGS PUSH=$PUSH MULTIARCH=$MULTIARCH REGISTRY=$REGISTRY bash builder.sh $*
 }
 
 set -e
