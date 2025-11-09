@@ -1,8 +1,7 @@
 [
     {
         "image_name": "conductor",
-        "path": "conductor",
-        "dockerfile": "Dockerfile"
+        "path": "conductor"
     },
     {
         "image_name": "conductor-pterodactyl",
@@ -29,32 +28,26 @@
     },
     {
         "image_name": "stun",
-        "path": "stun",
-        "dockerfile": "Dockerfile"
+        "path": "stun"
     },
     {
         "image_name": "disposable-minecraft",
-        "path": "disposable-minecraft",
-        "dockerfile": "Dockerfile"
+        "path": "disposable-minecraft"
     },
     {
         "image_name": "registry-auth-proxy",
-        "path": "registry-auth-proxy",
-        "dockerfile": "Dockerfile"
+        "path": "registry-auth-proxy"
     },
     {
         "image_name": "jenkins-with-dockercli",
-        "path": "jenkins-with-dockercli",
-        "dockerfile": "Dockerfile"
+        "path": "jenkins-with-dockercli"
     },
     {
         "image_name": "pterodactyl-wings",
-        "path": "pterodactyl-wings",
-        "dockerfile": "Dockerfile"
+        "path": "pterodactyl-wings"
     },
     {
         "image_name": "php-laravel",
-        "path": "php-laravel",
-        "dockerfile": "Dockerfile"
+        "path": "php-laravel"
     }
 ]

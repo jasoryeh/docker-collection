@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build Information
         run: |
-          echo "Building image: ${{ matrix.image }}"
+          echo "Building image: ${{ toJson(matrix.image) }}"
           echo "Files:"
           ls -lah
       - name: Get tags
@@ -56,4 +56,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       # Build & Publish
       - name: Build & Publish Docker Image
-        run: BUILDX_ARGS="--cache-from=gha --cache-to=gha,mode=max --progress=plain" PUSH=1 MULTIARCH=1 REGISTRY=${{ secrets.DOCKER_USERNAME }} PUSH=1 bash builder.sh ${{ matrix.image.path }} ${{ matrix.image.name }} ${{ matrix.image.dockerfile || 'Dockerfile' }} ${{ matrix.image.tag || 'latest'}}
+        run: BUILDX_ARGS="--cache-from=gha --cache-to=gha,mode=max --progress=plain" PUSH=1 MULTIARCH=1 REGISTRY=${{ secrets.DOCKER_USERNAME }} PUSH=1 bash builder.sh ${{ matrix.image.path }} ${{ matrix.image.image_name }} ${{ matrix.image.dockerfile || 'Dockerfile' }} ${{ matrix.image.tag || 'latest'}}
