@@ -1,9 +1,5 @@
 [
     {
-        "image_name": "conductor",
-        "path": "conductor"
-    },
-    {
         "image_name": "conductor-pterodactyl",
         "path": "conductor-pterodactyl",
         "dockerfile": "8.Dockerfile",
