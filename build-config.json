@@ -1,0 +1,60 @@
+[
+    {
+        "image_name": "conductor",
+        "path": "conductor",
+        "dockerfile": "Dockerfile"
+    },
+    {
+        "image_name": "conductor-pterodactyl",
+        "path": "conductor-pterodactyl",
+        "dockerfile": "8.Dockerfile",
+        "tag": "8"
+    },
+    {
+        "image_name": "conductor-pterodactyl",
+        "path": "conductor-pterodactyl",
+        "dockerfile": "17.Dockerfile",
+        "tag": "17"
+    },
+    {
+        "image_name": "conductor-pterodactyl",
+        "path": "conductor-pterodactyl",
+        "dockerfile": "21.Dockerfile",
+        "tag": "21"
+    },
+    {
+        "image_name": "conductor-pterodactyl",
+        "path": "conductor-pterodactyl",
+        "dockerfile": "21.Dockerfile"
+    },
+    {
+        "image_name": "stun",
+        "path": "stun",
+        "dockerfile": "Dockerfile"
+    },
+    {
+        "image_name": "disposable-minecraft",
+        "path": "disposable-minecraft",
+        "dockerfile": "Dockerfile"
+    },
+    {
+        "image_name": "registry-auth-proxy",
+        "path": "registry-auth-proxy",
+        "dockerfile": "Dockerfile"
+    },
+    {
+        "image_name": "jenkins-with-dockercli",
+        "path": "jenkins-with-dockercli",
+        "dockerfile": "Dockerfile"
+    },
+    {
+        "image_name": "pterodactyl-wings",
+        "path": "pterodactyl-wings",
+        "dockerfile": "Dockerfile"
+    },
+    {
+        "image_name": "php-laravel",
+        "path": "php-laravel",
+        "dockerfile": "Dockerfile"
+    }
+]
