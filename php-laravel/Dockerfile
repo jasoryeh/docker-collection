@@ -1,4 +1,9 @@
-FROM php:8.2-fpm-alpine
+ARG BASE_IMAGE_REPO=php
+ARG BASE_IMAGE_TAG=8.4-fpm-alpine
+
+ARG BASE_IMAGE=${BASE_IMAGE_REPO}:${BASE_IMAGE_TAG}
+
+FROM ${BASE_IMAGE}
 
 # dependencies
 RUN apk add \

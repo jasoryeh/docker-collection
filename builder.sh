@@ -29,10 +29,10 @@ if [ ! -z ${MULTIARCH} ]; then
     else
         BUILDX_ARGS="--output type=image"
     fi
-    docker buildx build --platform ${IM_PLATFORMS:-linux/amd64,linux/aarch64} $BUILDX_ARGS --build-arg INTERMEDIATE_REPO=$IM_REGISTRY \
+    docker buildx build --platform ${IM_PLATFORMS:-linux/amd64,linux/aarch64} $BUILDX_ARGS $GENERAL_BUILD_ARGS --build-arg INTERMEDIATE_REPO=$IM_REGISTRY \
         -t ${IM_TAG} -f $CONTAINER_DIR/$IM_FILE $CONTAINER_DIR
 else
-    docker build --build-arg INTERMEDIATE_REPO=$IM_REGISTRY \
+    docker build $BUILD_ARGS $GENERAL_BUILD_ARGS --build-arg INTERMEDIATE_REPO=$IM_REGISTRY \
         -t ${IM_TAG} -f $CONTAINER_DIR/$IM_FILE $CONTAINER_DIR
     if [ ! -z ${PUSH} ]; then
         docker push ${IM_TAG}
