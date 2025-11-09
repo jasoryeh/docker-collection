@@ -19,9 +19,12 @@ jobs:
       - id: read
         name: Read images config
         run: |
-          echo "images<<EOF" >> $GITHUB_OUTPUT
-          cat build-config.json >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "images<<EOF"
+            cat build-config.json
+            echo ""
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
   build-and-push:
     name: Build and Push Images
     needs: prepare
